@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          echo "DB_HOST=mysql_payments" > .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_NAME=labo05_payments_db" >> .env
+          echo "DB_USER=labo05" >> .env
+          echo "DB_PASSWORD=labo05" >> .env
+
+      - name: Create external network if not exists
+        run: docker network create labo05-network || true
+
+      - name: Start services
+        run: docker-compose up -d --build
+
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL..."
+          sleep 15
+
+      - name: Run tests
+        run: docker-compose exec -T payments_api pytest src/tests/ -v
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down -v
