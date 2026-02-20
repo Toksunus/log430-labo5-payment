@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: Pre-cleanup
-        run: docker run --rm -v "$GITHUB_WORKSPACE:/workspace" alpine find /workspace -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+        run: docker run --rm -v "$GITHUB_WORKSPACE:/workspace" alpine sh -c "find /workspace -type d \( -name __pycache__ -o -name .pytest_cache \) -exec rm -rf {} + 2>/dev/null; true"
 
       - name: Checkout dépot
         uses: actions/checkout@v4
