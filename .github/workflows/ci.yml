@@ -34,7 +34,7 @@ jobs:
           sleep 15
 
       - name: Run tests
-        run: docker-compose exec -T payments_api pytest src/tests/ -v
+        run: docker-compose exec -T payments_api pytest tests/ -v
 
       - name: Stop services
         if: always()
