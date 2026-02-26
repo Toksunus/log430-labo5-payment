@@ -6,6 +6,7 @@ Auteurs : Gabriel C. Ullmann, Fabio Petrillo, 2025
 
 from models.payment import Payment
 from db import get_sqlalchemy_session
+import requests
 
 def create_payment(order_id: int, user_id: int, total_amount: float):
     """Insert payment with items in MySQL"""
@@ -43,6 +44,8 @@ def update_status_to_paid(payment_id: int):
         # Update the payment status
         payment.is_paid = True
         session.commit()
+
+        update_order_in_store_manager(payment.order_id)
         
         return {
             "payment_id": payment_id,
@@ -60,3 +63,17 @@ def update_status_to_paid(payment_id: int):
         }
     finally:
         session.close()
+
+def update_order_in_store_manager(order_id: int):
+    """ appelle l'endpoint PUT /orders dans log430-labo05 pour mettre à jour la commande de (modifier is_paid à true) via krakend"""
+
+    response = requests.put(f"http://api-gateway:8080/store-manager-api/orders",
+    json={"order_id": order_id, "is_paid": True},
+    headers={"Content-Type": "application/json"}
+    )
+
+    if response.ok:
+        print(f"Order {order_id} updated to paid in Store Manager.")
+    else:
+        print(f"Failed to update order {order_id} in Store Manager. Status code: {response.status_code}")
+        
