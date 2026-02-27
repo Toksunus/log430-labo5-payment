@@ -13,13 +13,14 @@ jobs:
       - name: Checkout dépot
         uses: actions/checkout@v4
 
-      - name: Créer fichier .env (TODO - utilisez les secrets)
+      - name: Créer fichier .env
         run: |
           echo "DB_HOST=mysql_payments" >> .env
           echo "DB_PORT=3306" >> .env
-          echo "DB_NAME=labo05_payments_db" >> .env
-          echo "DB_USER=labo05" >> .env
-          echo "DB_PASSWORD=labo05" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
 
       - name: Démarrer le conteneur
         run: |
